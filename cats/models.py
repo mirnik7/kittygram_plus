@@ -1,5 +1,13 @@
 from django.db import models
 
+CHOICES = (
+    ('Gray', 'Серый'),
+    ('Black', 'Чёрный'),
+    ('White', 'Белый'),
+    ('Ginger', 'Рыжий'),
+    ('Mixed', 'Смешанный'),
+)
+
 
 class Achievement(models.Model):
     name = models.CharField(max_length=64)
@@ -18,7 +26,8 @@ class Owner(models.Model):
 
 class Cat(models.Model):
     name = models.CharField(max_length=16)
-    color = models.CharField(max_length=16)
+    # Ограничение возможных значений поля c помощью choices
+    color = models.CharField(max_length=16, choices=CHOICES)
     birth_year = models.IntegerField()
     owner = models.ForeignKey(
         Owner, related_name='cats', on_delete=models.CASCADE)

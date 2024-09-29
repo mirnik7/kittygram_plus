@@ -1,22 +1,33 @@
 from rest_framework import serializers
+import datetime as dt
+import webcolors
 
-from .models import Cat, Owner, Achievement, AchievementCat
+from .models import Cat, Owner, Achievement, AchievementCat, CHOICES
 
 
 class AchievementSerializer(serializers.ModelSerializer):
+    # Переопределение поля и применение параметра source со старым именем из модели
+    achievement_name = serializers.CharField(source='name')
 
     class Meta:
         model = Achievement
-        fields = ('id', 'name')
+        fields = ('id', 'achievement_name')
 
 
 class CatSerializer(serializers.ModelSerializer):
     # Переопределяем поле achievements. Назначьте типом поля achievements сериализатор AchievementSerializer. Да, так можно!
     achievements = AchievementSerializer(many=True, required=False)
+    age = serializers.SerializerMethodField()
+    # Теперь поле примет только значение, упомянутое в списке CHOICES
+    color = serializers.ChoiceField(choices=CHOICES)
 
     class Meta:
         model = Cat
-        fields = ('id', 'name', 'color', 'birth_year', 'owner', 'achievements')
+        fields = ('id', 'name', 'color', 'birth_year',
+                  'owner', 'achievements', 'age')
+
+    def get_age(self, obj):
+        return dt.datetime.now().year - obj.birth_year
 
     def create(self, validated_data):
         # Если в исходном запросе не было поля achievements
